@@ -11,14 +11,14 @@ def _supported(extensions, layers) -> bool:
     log.info(f"Supported Vulkan extensions: {supported_extensions}")
     sext = set(extensions)
     if not sext.issubset(supported_extensions):
-        log.error(f"Unsupported extensions: {sext - supported_extensions}")
+        log.error(f"Unsupported Vulkan extensions: {sext - supported_extensions}")
         return False
 
     supported_layers = set([layer.layerName for layer in vkEnumerateInstanceLayerProperties()])
     log.info(f"Supported Vulkan layers: {supported_layers}")
     slay = set(layers)
     if not slay.issubset(supported_layers):
-        log.error(f"Unsupported layers: {slay - supported_layers}")
+        log.error(f"Unsupported Vulkan layers: {slay - supported_layers}")
         return False
 
     return True
@@ -71,7 +71,7 @@ def make_instance(application_name):
         layers += ["VK_LAYER_KHRONOS_validation"]
 
     if not _supported(extensions, layers):
-        return None
+        raise Exception("Unsupported Vulkan extensions or layers")
 
     log.info(f"Creating Vulkan instance: extensions={extensions}, layers={layers}, flags={flags}")
 
@@ -81,4 +81,7 @@ def make_instance(application_name):
         enabledLayerCount=len(layers), ppEnabledLayerNames=layers,
         enabledExtensionCount=len(extensions), ppEnabledExtensionNames=extensions,
     )
-    return vkCreateInstance(create_info, None)
+    instance = vkCreateInstance(create_info, None)
+    if not instance:
+        raise Exception("Failed to create Vulkan instance")
+    return instance
