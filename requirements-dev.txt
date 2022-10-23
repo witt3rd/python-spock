@@ -1,0 +1,6 @@
+autopep8
+ipykernel
+ipywidgets
+tqdm
+pandas
+wheel
